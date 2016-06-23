@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('Chatbot:server');
 var http = require('http');
+var jsdom = require('jsdom');
 
 /**
  * Get port from environment and store in Express.
@@ -88,3 +89,18 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+
+
+/**
+ * jsdom test
+ *
+ */
+
+jsdom.env({
+  file : "./views/index.html",
+  //scripts : ["http://code.jquery.com/jquery.js"],
+  done : function (err, window) {
+    console.log("contents of h1:", window.document.getElementsByTagName('h1')[0].textContent);
+  }
+});
