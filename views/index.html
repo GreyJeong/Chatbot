@@ -41,7 +41,7 @@
  			<div class="col-md-3"></div>
  			<div class="col-md-4">
  				<input type="text" id="user_input"size="70"></input>
- 				<button class="btn-default">Send</button>
+ 				<button class="btn-default" onclick="input_text()">Send</button>
  			</div>
  			<div class="col-md-4"></div>
  			
@@ -54,6 +54,16 @@
  	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
   </body>
+  <script>
+  	function input_text()
+  	{
+  		var input = document.getElementById('user_input').value;
+  		document.getElementById('user_input').value = "";
+
+  		var chat_content = document.getElementById('chat_area').value;
+  		document.getElementById('chat_area').value = chat_content + input + "\n";
+  	}
+  </script>
 
 </html>
 
