@@ -7,7 +7,10 @@
 var app = require('../app');
 var debug = require('debug')('Chatbot:server');
 var http = require('http');
-var jsdom = require('jsdom');
+var htmlReader = require('fs');
+var httpServer = http.createServer(app);
+var chatSocket = require('socket.io').listen(httpServer);
+//var jsdom = require('jsdom');
 
 /**
  * Get port from environment and store in Express.
@@ -17,18 +20,11 @@ var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-/**
  * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+ */ 
+httpServer.listen(port);
+httpServer.on('error', onError);
+httpServer.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -83,24 +79,51 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
+  var addr = httpServer.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
 
+/**
+ * Socket.io for Chat
+ */
+chatSocket.sockets.on('connection',function(socket){
+  console.log("new connection");
 
+  socket.on('from_client', function(msg){
+    console.log(msg);
+    socket.emit('to_client', "Server Message");
+  });
+});
 
 /**
  * jsdom test
  *
  */
 
-jsdom.env({
+/*jsdom.env({
   file : "./views/index.html",
   //scripts : ["http://code.jquery.com/jquery.js"],
   done : function (err, window) {
     console.log("contents of h1:", window.document.getElementsByTagName('h1')[0].textContent);
   }
-});
+});*/
+
+/*var http = require('http'),
+    io = require('socket.io'),
+    express = require('express');
+
+var port = 3000;
+var server = http.createServer();
+io = require('socket.io').listen(server);
+//server.use(express.static(__dirname + '/public'));
+server.listen(port);
+
+io.sockets.on('connection', function(socket){
+  socket.emit('toclient',{hello: 'foo'});
+  socket.on('fromclient', function(data){
+    console.log(data);
+  });
+});*/

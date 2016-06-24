@@ -53,17 +53,39 @@
 
  	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
+ 	<script src="/socket.io/socket.io.js"></script>
+
   </body>
   <script>
   	function input_text()
   	{
   		var input = document.getElementById('user_input').value;
+  		sendToServer(input);
   		document.getElementById('user_input').value = "";
 
   		var chat_content = document.getElementById('chat_area').value;
   		document.getElementById('chat_area').value = chat_content + input + "\n";
   	}
   </script>
+  
+  <script>
+  	<!--Connect to Server on index page load -->
+  	var socket;
+  	socket = io();
+  	socket.on('to_client', function(msg){
+ 		document.getElementById('chat_area').value += msg + "\n";
+	});
+
+
+  </script>
+
+  <script>
+  	function sendToServer(input){
+  		socket.emit('from_client',input);
+  	}
+  </script>
+
+  
 
 </html>
 
