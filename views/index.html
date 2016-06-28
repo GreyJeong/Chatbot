@@ -72,6 +72,7 @@
   	<!--Connect to Server on index page load -->
   	var socket;
   	socket = io();
+
   	socket.on('to_client', function(msg){
  		document.getElementById('chat_area').value += msg + "\n";
 	});
