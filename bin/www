@@ -19,6 +19,31 @@ var chatSocket = require('socket.io').listen(httpServer);
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+/*
+ * TCP Socket for Chatbot Core : Chatscript local Server
+ *
+ */
+
+var net = require('net');
+var client = new net.Socket();
+client.connect(1024, 'localhost',function(){
+  console.log("chat server connected!");
+
+  var user = "grey";
+  var bot = "CAT";
+  var message = "hello";
+  var sendMessage = user + '\0' + bot + '\0' + message + '\0';
+  client.write(sendMessage);
+});
+
+client.on('data', function(data){
+  console.log(data.toString());
+});
+
+client.on('close', function(){
+  console.log("chat server disconnected!");
+});
+
 /**
  * Listen on provided port, on all network interfaces.
  */ 
@@ -97,6 +122,8 @@ chatSocket.sockets.on('connection',function(socket){
     socket.emit('to_client', "Server Message");
   });
 });
+
+
 
 /**
  * jsdom test
