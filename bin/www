@@ -93,6 +93,11 @@
  */
  var net = require('net');
 
+/*
+ * iconv-lite module for avoiding corrupted Korean
+ *
+ */
+ var iconv = require('iconv-lite');
 
 /**
  * Socket.io for Chat
@@ -110,14 +115,12 @@
 
       var user = "grey";
       var bot = "CAT";
-      var message = "hello";
-    var sendMessage = user + '\0' + bot + '\0' + message + '\0'; //put null character at the end of each string
-    chatScript.write(sendMessage);
+    var sendMessage = user + '\0' + bot + '\0' + msg + '\0'; //put null character at the end of each string
+      chatScript.write(iconv.encode(sendMessage,'euckr')); //Encoding message to EUC-KR for avoiding Korean message corrupted.
     });
 
     chatScript.on('data', function(data){
-      console.log(data.toString());
-      response = data.toString();
+      response = iconv.decode(data,'euckr');
       socket.emit('to_client', response); //send ChatScript Server response to User
     });
 
