@@ -4,58 +4,34 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('Chatbot:server');
-var http = require('http');
-var htmlReader = require('fs');
-var httpServer = http.createServer(app);
-var chatSocket = require('socket.io').listen(httpServer);
+ var app = require('../app');
+ var debug = require('debug')('Chatbot:server');
+ var http = require('http');
+ var htmlReader = require('fs');
+ var httpServer = http.createServer(app);
+ var chatSocket = require('socket.io').listen(httpServer);
 //var jsdom = require('jsdom');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+ var port = normalizePort(process.env.PORT || '3000');
+ app.set('port', port);
 
-/*
- * TCP Socket for Chatbot Core : Chatscript local Server
- *
- */
-
-var net = require('net');
-var client = new net.Socket();
-client.connect(1024, 'localhost',function(){
-  console.log("chat server connected!");
-
-  var user = "grey";
-  var bot = "CAT";
-  var message = "hello";
-  var sendMessage = user + '\0' + bot + '\0' + message + '\0';
-  client.write(sendMessage);
-});
-
-client.on('data', function(data){
-  console.log(data.toString());
-});
-
-client.on('close', function(){
-  console.log("chat server disconnected!");
-});
 
 /**
  * Listen on provided port, on all network interfaces.
  */ 
-httpServer.listen(port);
-httpServer.on('error', onError);
-httpServer.on('listening', onListening);
+ httpServer.listen(port);
+ httpServer.on('error', onError);
+ httpServer.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+ function normalizePort(val) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -75,27 +51,27 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+ function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
 
   var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  ? 'Pipe ' + port
+  : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
+    console.error(bind + ' requires elevated privileges');
+    process.exit(1);
+    break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
+    console.error(bind + ' is already in use');
+    process.exit(1);
+    break;
     default:
-      throw error;
+    throw error;
   }
 }
 
@@ -103,23 +79,51 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening() {
+ function onListening() {
   var addr = httpServer.address();
   var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
+  ? 'pipe ' + addr
+  : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+/*
+ * TCP Socket Module for Chatbot Core : Chatscript local Server
+ *
+ */
+ var net = require('net');
+
 
 /**
  * Socket.io for Chat
  */
-chatSocket.sockets.on('connection',function(socket){
-  console.log("new connection");
-
+ chatSocket.sockets.on('connection',function(socket){
+  console.log("new User Connection");
+ 
   socket.on('from_client', function(msg){
-    console.log(msg);
-    socket.emit('to_client', "Server Message");
+    console.log("User : " + msg);
+
+    var chatScript = new net.Socket();  //make a new socket to connect ChatScript Server
+    var response;
+    chatScript.connect(1024, 'localhost',function(){ //IP : localhost default Port : 1024 
+      console.log("ChatScript server connected!");
+
+      var user = "grey";
+      var bot = "CAT";
+      var message = "hello";
+    var sendMessage = user + '\0' + bot + '\0' + message + '\0'; //put null character at the end of each string
+    chatScript.write(sendMessage);
+    });
+
+    chatScript.on('data', function(data){
+      console.log(data.toString());
+      response = data.toString();
+      socket.emit('to_client', response); //send ChatScript Server response to User
+    });
+
+    chatScript.on('close', function(){
+      console.log("ChatScript Server disconnected!");
+    });
   });
 });
 
