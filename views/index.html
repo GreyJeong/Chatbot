@@ -59,12 +59,16 @@
   <script>
   	function input_text()
   	{
-  		var input = document.getElementById('user_input').value;
+  		/*var input = document.getElementById('user_input').value;*/
+  		var input = $('#user_input').val();
   		sendToServer(input);
-  		document.getElementById('user_input').value = "";
+  		/*document.getElementById('user_input').value = "";*/
+  		$('#user_input').val('');
 
-  		var chat_content = document.getElementById('chat_area').value;
-  		document.getElementById('chat_area').value = chat_content + input + "\n";
+  		/*var chat_content = document.getElementById('chat_area').value;*/
+  		var chat_content = $('#chat_area').val();
+  		/*document.getElementById('chat_area').value = chat_content + input + "\n";*/
+  		$('#chat_area').val(chat_content + input + "\n").focus();
   	}
   </script>
   
@@ -74,7 +78,9 @@
   	socket = io();
 
   	socket.on('to_client', function(msg){
- 		document.getElementById('chat_area').value += msg + "\n";
+ 		/*document.getElementById('chat_area').value += msg + "\n";*/
+ 		var chat_content = $('#chat_area').val();
+ 		$('#chat_area').val(chat_content + msg + "\n").focus();
 	});
 
 
